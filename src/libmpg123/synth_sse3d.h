@@ -49,19 +49,24 @@ SYNTH_NAME:
 /* stack:0=ebp 4=back 8=bandptr 12=channel 16=samples 20=buffs 24=bo 28=decwins */
 	movl	%esp, %ebp
 
+/* Now the old stack addresses are preserved via %epb. */
+#ifdef PIC
+	subl  $8,%esp /* What has been called temp before. */
+#else
+	subl  $4,%esp /* What has been called temp before. */
+#endif
+	pushl	%edi
+	pushl	%esi
+	pushl	%ebx
+
 #ifdef PIC
 	#undef _EBX_
 	#define _EBX_ %eax
 	GET_GOT _EBX_
 #define EBXSAVE 32(%ebp)
-	PREPARE_GOT /* pushl _EBX_ - save */
+	movl _EBX_, EBXSAVE /* save PIC register */
 #endif
 
-/* Now the old stack addresses are preserved via %epb. */
-	subl  $4,%esp /* What has been called temp before. */
-	pushl	%edi
-	pushl	%esi
-	pushl	%ebx
 #define TEMP 12(%esp)
 /* APP */
 	movl 12(%ebp),%ecx
@@ -257,9 +262,10 @@ SYNTH_NAME:
 	popl	%ebx
 	popl	%esi
 	popl	%edi
-	addl $4,%esp
 #ifdef PIC
-	RESTORE_GOT
+	addl $8,%esp
+#else
+	addl $4,%esp
 #endif
 	popl	%ebp
 	ret
