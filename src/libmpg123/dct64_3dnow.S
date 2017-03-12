@@ -25,7 +25,6 @@ ASM_NAME(dct64_3dnow):
 
 	#undef _EBX_
 	#define _EBX_ %ecx
-	PREPARE_GOT
 	GET_GOT _EBX_
 
 	leal 16(%esp),%ebx
@@ -706,7 +705,6 @@ ASM_NAME(dct64_3dnow):
 	movd %mm4,960(%edx)
 
 	/*  femms */
-	RESTORE_GOT
 
         popl %ebx
 	popl %esi
